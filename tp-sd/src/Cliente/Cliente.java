@@ -14,6 +14,31 @@ import java.net.Socket;
  *
  * @author Gonçalo
  */
-public class Cliente {
-    
+public class Cliente extends Thread {
+
+    public void run() {
+        try {
+            Socket socket = new Socket("localhost",6063);
+
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+
+
+            ClienteApp ca = new ClienteApp(out,in);
+
+            ca.iniciaAppCliente();
+
+        }
+
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String [] args ){
+
+        Cliente c = new Cliente();
+        c.start();
+    }
 }
