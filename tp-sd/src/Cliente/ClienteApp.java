@@ -250,6 +250,104 @@ public class ClienteApp {
         }
         
         
+   
+        
+            public void initMenuVendedor(){
+                int comprador = 0;
+                do{
+                    menuLoggedInVendedor.executa();
+                    switch (menuLoggedInVendedor.getOpcao()){
+                        case 1:criarLeilao();
+                            break;
+                        case 2:alterarDetalhes();
+                            comprador=1;
+                            break;
+                        case 3:alterarparaComprador();
+                            break;
+                        case 4:terminarLeilao();
+                            break;
+                        case 5:mudarPassword();
+                            break;
+                    }
+                } while (menuLoggedInVendedor.getOpcao()!=0 && comprador == 0);
+                System.out.println("Logout!");
+                if(comprador==1){
+                    initMenuComprador();
+                }
+            }
+        
+            
+            public void criarLeilao(){
+                
+                try{
+                    out.writeObject("criar");
+                    
+                    String resp = (String) in.readObject();
+                    
+                    System.out.println(resp);
+                
+                } catch (IOException | ClassNotFoundException e){
+                e.printStackTrace();
+                }
+            }
+            
+            public void alterarDetalhes(){
+                
+                Scanner input = new Scanner(System.in);
+                int idleilao;
+                
+                System.out.print("Leilão a alterar:");
+                idleilao=input.nextInt();
+                
+                try{
+                    out.writeObject("alterar");
+                    
+                    out.writeObject(idleilao);
+                    
+                    String resp = (String) in.readObject();
+                    
+                    System.out.println(resp);
+                } catch (IOException | ClassNotFoundException e){
+                e.printStackTrace();
+                }
+            }
+            
+            
+            public void alterarparaComprador(){
+                
+                try{
+                    out.writeObject("sercomprador");
+
+                    String resp = (String) in.readObject();
+
+                    System.out.println(resp);
+                    } catch (IOException | ClassNotFoundException e){
+                        e.printStackTrace();
+                        }
+            
+            }
+            
+            public void terminarLeilao(){
+            
+                Scanner input = new Scanner(System.in);
+                int idleilao;
+                
+                System.out.print("Leilão a terminar:");
+                idleilao=input.nextInt();
+                
+                try{
+                    out.writeObject("terminar");
+                    
+                    out.writeObject(idleilao);
+                    
+                    String resp = (String) in.readObject();
+                    
+                    System.out.println(resp);
+                } catch (IOException | ClassNotFoundException e){
+                e.printStackTrace();
+                }
+            
+            }
         
         
         
