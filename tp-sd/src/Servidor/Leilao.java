@@ -7,8 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Leilao implements Serializable{
   private int id, maiorofer;
-  private String descricao, maioruti, dono;
-  private HashSet<String> lista;
+  private String descricao, maioruti, dono, ultimouti;
 
   public Leilao(int id, String dono, String descricao){
     this.id = id;
@@ -16,7 +15,7 @@ public class Leilao implements Serializable{
     this.descricao = descricao;
     this.maiorofer = 0;
     this.maioruti = "";
-    this.lista = new HashSet();
+    this.ultimouti = "";
   }
 
   public Leilao(Leilao l){
@@ -25,7 +24,7 @@ public class Leilao implements Serializable{
     this.descricao = l.getDescricao();
     this.maiorofer = l.getMaiorOferta();
     this.maioruti = l.getMaiorUti();
-    this.lista = new HashSet(l.getLista());
+    this.ultimouti = l.getUltimoUti();
   }
 
   public int getId(){
@@ -40,14 +39,13 @@ public class Leilao implements Serializable{
     return this.descricao;
   }
 
-  public Set<String> getLista(){
-    Set<String> aux = new HashSet(this.lista);
-    return aux;
+  public String getUltimoUti(){
+    return this.ultimouti;
   }
 
   public void insereLicitacao(int oferta, String nome){
     if(oferta>this.maiorofer) {
-      this.lista.put(this.maiorouti,this.maiorofer);
+      this.ultimouti = this.maioruti;
       this.maiorofer = oferta;
       this.maioruti = nome;
     }
@@ -87,7 +85,8 @@ public class Leilao implements Serializable{
     sb.append("\nLicitador: ");
     sb.append(this.maioruti);
     sb.append("\n");
-
+    sb.append(this.ultimouti);
+    sb.append("\n");
     return sb.toString();
   }
 
@@ -100,7 +99,7 @@ public class Leilao implements Serializable{
     if(l == null || this.getClass() != l.getClass()) return false;
     else{
       Leilao aux = (Leilao) l;
-      return (this.getId().equals(l.getId()) && this.getDono().equals(l.getDono()) && this.getDescricao().equals(l.getDescricao()) && this.getMaiorOferta().equals(l.getMaiorOferta()) && this.getMaiorUti().equals(l.getMaiorUti()));
+      return (this.getId().equals(l.getId()) && this.getDono().equals(l.getDono()) && this.getDescricao().equals(l.getDescricao()) && this.getMaiorOferta().equals(l.getMaiorOferta()) && this.getMaiorUti().equals(l.getMaiorUti()) && this.getUltimoUti().equals(l.getUltimoUti()));
     }
   }
 }

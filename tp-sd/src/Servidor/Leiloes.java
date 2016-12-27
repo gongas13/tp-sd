@@ -6,12 +6,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Leiloes implements Serializable{
   private ReentrantLock lock;
+  private Condition maiorOferta;
   private int ids;
   private HashMap<int,Leilao> leiloesemcurso;
   private HashMap<int,Leilao> leiloesterminados;
 
   public Leiloes(){
     this.lock = new ReentrantLock();
+    this.ids = 1;
     this.leiloesemcurso = new HashMap<>();
     this.leiloesterminados = new HashMap<>();
   }
@@ -22,7 +24,7 @@ public class Leiloes implements Serializable{
     this.leiloesterminados = l.getLeiloesTerminados();
   }
 
-  public void insereLeilao(String utilizador, String descricao){
+  public void inserirLeilao(String utilizador, String descricao){
     this.lock.lock();
     try{
       Leilao l = new Leilao(this.ids, utilizador, descricao);
@@ -33,21 +35,25 @@ public class Leiloes implements Serializable{
     }
   }
 
-  public String fechaLeilao(int id, String utilizador){
+  public String fecharLeilao(int id, String utilizador){
     this.lock.lock();
     try{
-
+      StringBuilder sb = new StringBuilder();
+      Leilao aux = this.leiloesemcurso.remove(id);
+      this.leiloesterminados.put(id,aux);
+      sb.append(aux.toString())
     }
     finally{
       this.lock.unlock();
+      return sb.toString();
     }
   }
 
-  public void licitar(int id, String utilizador, int oferta){
+  public String licitar(int id, String utilizador, int oferta){
     this.lock.lock();
     try{
       String aux;
-      Leilao l = this.leiloesemcurso.get(id).clone();
+      Leilao l = this.leiloesemcurso.get(id);
       if(l.getMaiorOferta() < oferta) aux = "A oferta tem de ser maior que a existente\n";
       else {
         l.insereLicitacao(oferta,utilizador);
@@ -55,12 +61,12 @@ public class Leiloes implements Serializable{
       }
     }
     finally{
-      this.lock.unlock();
+      this.lock.unlock();      
       return aux;
     }
   }
 
-  public String listaEmCurso(String utilizador){
+  public String listarEmCurso(String utilizador){
     this.lock.lock();
     try{
       TreeSet aux = this.leiloesemcurso.values();
@@ -80,20 +86,10 @@ public class Leiloes implements Serializable{
   }
 
   public String toString(){
-    StringBuilder sb = new StringBuilder();
-    sb.append("Id: ");
-    sb.append(this.id.toString());
-    sb.append("\nDescricao: ");
-    sb.append(this.descricao);
-    sb.append("\n");
-    sb.append("\nOferta: ");
-    sb.append(this.maiorofer.toString());
-    sb.append("\n");
 
-    return sb.toString();
   }
 
   public Leilao clone(){
-    return new Leilao(this);
+
   }
 }
