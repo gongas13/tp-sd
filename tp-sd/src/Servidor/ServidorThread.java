@@ -6,24 +6,26 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServidorThread extends Thread {
     private Socket socket;
-    private Dados dados;
     private Utilizador utilizador;
-    private String user;
-    private HashMap<>;
+    private Leiloes leiloes;
+    private Utilizadores users;
 
     public ServidorThread(Socket socket) {
         this.socket = socket;
-        this.dados = new Dados();
     }
 
-    public ServidorThread(Socket socket, Dados dados) {
+    public ServidorThread(Socket socket, Utilizadores users, Leiloes leiloes) {
         this.socket = socket;
-        this.dados = dados;
+        this.users = users;
+        this.leiloes = leiloes;
     }
 
+    @Override
     public void run() {
         try {
             ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
@@ -37,6 +39,29 @@ public class ServidorThread extends Thread {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                
+                if (line.equals("login")) {
+                    String username = (String) in.readObject();
+                    String password = (String) in.readObject();
+                    String resp = "insucesso";
+                    Boolean logged = false;
+                    System.out.println(this.utilizador.getClass());
+                    try {
+                        logged = this.users.login(username, password);
+                        this.utilizador = this.users.getUtilizador(username);
+                        System.out.println(this.utilizador.getClass());
+                    } catch (UtilizadorNaoExisteException e) {
+                        resp = "utilizadornaoexiste";
+                    } catch (PasswordErradaException e) {
+                        resp = "passworderrada";
+                    } catch (Exception e) {
+                        System.out.println("Erro!");
+                        e.printStackTrace();
+                    }
+                    if (logged)
+                        resp = "logado";
+                    out.writeObject(resp);
+                }                
 
                 if (line.equals("registo")) {
                     String username = (String) in.readObject();
@@ -44,10 +69,10 @@ public class ServidorThread extends Thread {
                     String resposta;
 
                     try {
-                        this.dados.registarUtilizador(username, password);
+                        this.users.registarUtilizador(username, password);
                         resposta = "sucesso";
-                        this.user = username;
-                        this.utilizador = this.dados.getUtilizador(username);
+                        this.utilizador = this.users.getUtilizador(username);
+                        
 
 
                     } catch (UtilizadorJaRegistadoException e) {
@@ -61,173 +86,54 @@ public class ServidorThread extends Thread {
                     out.writeObject(resposta);
                 }
 
-                if (line.equals("login")) {
-                    String username = (String) in.readObject();
-                    String password = (String) in.readObject();
-                    String resp = "insucesso";
-                    Boolean logged = false;
-                    System.out.println(this.utilizador.getClass());
-                    try {
-                        logged = this.dados.login(username, password);
-                        this.user = username;
-                        this.utilizador = this.dados.getUtilizador(username);
-                        System.out.println(this.utilizador.getClass());
-                    } catch (UtilizadorNaoExisteException e) {
-                        resp = "utilizadornaoexiste";
-                    } catch (PasswordErradaException e) {
-                        resp = "passworderrada";
-                    } catch (Exception e) {
-                        System.out.println("Erro!");
-                        e.printStackTrace();
-                    }
-                    if (this.utilizador instanceof Condutor && logged)
-                        resp = "logadocondutor";
-                    else if (logged)
-                        resp = "logadocliente";
-                    out.writeObject(resp);
-                }
-
-                if (line.equals("requisitar")) {
-                    Coordenada inicio;
-                    Coordenada fim;
+                if (line.equals("licitar")) {
                     String response;
+                    int idleilao = in.readInt();
+                    int valor = in.readInt();
 
+                    response = this.leiloes.licitar(idleilao, this.utilizador, valor);
 
-                    inicio = (Coordenada) in.readObject();
-                    this.utilizador.setCoordenada(inicio);
-                    fim = (Coordenada) in.readObject();
-                    this.dados.novoPedidoViagem(this.utilizador, fim);
-
-                    this.viagem = this.dados.getViagemCliente(this.user);
-
-                    Condutor condutor = this.viagem.getCondutor();
-                    Coordenada lcondutor = condutor.getCoordenada();
-                    double tempodechegada = inicio.distanciaCoords(lcondutor) * 1.3;
-                    double valordaviagem = this.viagem.getValorViagem();
-
-                    out.writeObject(condutor);
-
-                    out.writeObject(tempodechegada);
-
-                    out.writeObject(valordaviagem);
-
-                    this.dados.removerViagemCliente(this.utilizador.getUsername());
-                    this.dados.removerViagemCondutor(condutor.getUsername());
-
-                    /**while (!this.viagem.getChat().equals("cheguei")) {
-                        wait(1);
-                    }
-                    out.writeObject("cheguei");
-
-                    response = (String) in.readObject();
-                    this.viagem.setChat(response);
-                    double custoviagem = this.viagem.getValorViagem();
-                    out.writeObject(custoviagem);**/
-
-
-
+                    out.writeObject(response);
                 }
 
-                if (line.equals("anunciardisponibilidade")) {
-                    Coordenada localizacao;
-
-                    localizacao = (Coordenada) in.readObject();
-
-                    this.utilizador.setCoordenada(localizacao);
-
-                    this.dados.novoAnuncioDisponibilidade((Condutor) this.utilizador);
-
-                    this.viagem = this.dados.getViagemCondutor(user);
-                    System.out.println(this.viagem.toString());
-
-                    Utilizador cliente = this.viagem.getCliente();
-                    Coordenada inicio = this.viagem.getCInicio();
-                    double valordaviagem = this.viagem.getValorViagem();
-                    out.writeObject(cliente);
-                    out.writeObject(inicio);
-                    out.writeObject(valordaviagem);
-
-
-                    /**String estado = (String) in.readObject();
-                    this.viagem.setChat(estado);
-
-                    while(!this.viagem.getChat().equals("fim")){
-                        wait(1);
-                    }
-
-                    out.writeObject("Viagem concluida");
-
-
-                    /**String response = viagem.getCInicio().toString();
-                     out.writeObject("Início: " + response);
-                     response = viagem.getCFim().toString();
-                     out.writeObject("Fim: " + response);**/
+                if (line.equals("consultar")) {
+                    out.writeObject(this.leiloes.listarEmCurso(line));
                 }
-
-                if (line.equals("sercondutor")) {
-                    String matricula, modelo;
-
-                    matricula = (String) in.readObject();
-                    modelo = (String) in.readObject();
-
-                    this.dados.alterarClienteToCondutor(this.utilizador.getUsername(), matricula, modelo);
-                    this.utilizador = this.dados.getUtilizador(this.user);
-
-                    String resp = "sucesso";
-
-                    out.writeObject(resp);
-                }
-
+                
+                
                 if (line.equals("mudarpassword")) {
-                    String novapassword = (String) in.readObject();
+                    String newpassword = in.readLine();
+                    this.utilizador.setPassword(newpassword);
+                    out.writeObject("sucesso");
+                }
 
-                    this.utilizador.setPassword(novapassword);
-
-                    String resp = "sucesso";
-
+                if (line.equals("criar")) {
+                    String detalhes; 
+                    detalhes = in.readLine();
+                    
+                    this.leiloes.inserirLeilao(this.utilizador, detalhes);
+                }
+                
+                if (line.equals("terminar")) {
+                    int id = in.readInt();
+                    String resp;
+                    resp = this.leiloes.fecharLeilao(id, utilizador);
                     out.writeObject(resp);
                 }
-
-                if (line.equals("sercliente")) {
-
-                    this.dados.alterarCondutorToCliente(this.utilizador.getUsername());
-                    this.utilizador = this.dados.getUtilizador(this.user);
-                    String resp = "sucesso";
-
-                    out.writeObject(resp);
-                }
-
-                if (line.equals("mudardetalhesveiculo")) {
-                    String matricula, modelo;
-                    matricula = (String) in.readObject();
-                    modelo = (String) in.readObject();
-
-                    Condutor ca = (Condutor) this.utilizador;
-                    ca.setMatricula(matricula);
-                    ca.setModelo(modelo);
-
-                    String resp = "sucesso";
-
-                    out.writeObject(resp);
-
-                }
-
-                if (line.equals("detalhesveiculo")) {
-                    try {
-                        Condutor ca = (Condutor) this.utilizador;
-                        String matricula = ca.getMatricula();
-                        String modelo = ca.getModelo();
-                        System.out.println(ca.toString());
-                        out.writeObject(ca.getUsername());
-                        out.writeObject(ca.getPassword());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                    
+                    
+                    
+                /*if (line.equals("alterar")) {
+                String detalhes;
+                detalhes = in.readLine();
+                
+                this.leiloes.inserirLeilao(this.user, detalhes);
+                }*/
             }
-        } catch (IOException | ClassNotFoundException /**| InterruptedException **/| UtilizadorNaoExisteException e) {
+        } catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ServidorThread.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

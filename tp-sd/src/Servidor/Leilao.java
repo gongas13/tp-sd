@@ -31,7 +31,7 @@ public class Leilao implements Serializable{
     return this.id;
   }
 
-  public int getDono(){
+  public String getDono(){
     return this.dono;
   }
 
@@ -62,11 +62,11 @@ public class Leilao implements Serializable{
   public String getDetalhes(){
     StringBuilder sb = new StringBuilder();
     sb.append("Id: ");
-    sb.append(this.id.toString());
+    sb.append(this.id);
     sb.append("\nDescricao: ");
     sb.append(this.descricao);
     sb.append("\nOferta: ");
-    sb.append(this.maiorofer.toString());
+    sb.append(this.maiorofer);
     sb.append("\n");
 
     return sb.toString();
@@ -75,17 +75,15 @@ public class Leilao implements Serializable{
   public String toString(){
     StringBuilder sb = new StringBuilder();
     sb.append("Id: ");
-    sb.append(this.id.toString());
-    sb.append("\nDono");
+    sb.append(this.id);
+    sb.append("\nDono: ");
     sb.append(this.dono);
     sb.append("\nDescricao: ");
     sb.append(this.descricao);
-    sb.append("\nOferta: ");
-    sb.append(this.maiorofer.toString());
+    sb.append("\nMaior oferta: ");
+    sb.append(this.maiorofer);
     sb.append("\nLicitador: ");
     sb.append(this.maioruti);
-    sb.append("\n");
-    sb.append(this.ultimouti);
     sb.append("\n");
     return sb.toString();
   }
@@ -99,7 +97,7 @@ public class Leilao implements Serializable{
     if(l == null || this.getClass() != l.getClass()) return false;
     else{
       Leilao aux = (Leilao) l;
-      return (this.getId().equals(l.getId()) && this.getDono().equals(l.getDono()) && this.getDescricao().equals(l.getDescricao()) && this.getMaiorOferta().equals(l.getMaiorOferta()) && this.getMaiorUti().equals(l.getMaiorUti()) && this.getUltimoUti().equals(l.getUltimoUti()));
+      return ((this.getId() == aux.getId()) && this.getDono().equals(aux.getDono()) && this.getDescricao().equals(aux.getDescricao()) && (this.getMaiorOferta() == aux.getMaiorOferta()) && this.getMaiorUti().equals(aux.getMaiorUti()) && this.getUltimoUti().equals(aux.getUltimoUti()));
     }
   }
 }
