@@ -59,38 +59,37 @@ public class Leiloes implements Serializable{
 
   public String licitar(int id, Utilizador utilizador, int oferta){
     this.lock.lock();
-    try{
-      String aux;
+    String aux;
+    try{      
       Leilao l = this.leiloesemcurso.get(id);
       if(l.getMaiorOferta() < oferta) aux = "A oferta tem de ser maior que a existente\n";
       else {
         l.insereLicitacao(oferta,utilizador.getUsername());
         aux = "Inserido com sucesso";
-      }
-      return aux;
+      }      
     }
     finally{
       this.lock.unlock();
     }
+    return aux;
   }
 
   public String listarEmCurso(String utilizador){
     this.lock.lock();
+    StringBuilder sb = new StringBuilder();
     try{
-      Iterator it = this.leiloesemcurso.values().iterator();
-      StringBuilder sb = new StringBuilder();
+      Iterator it = this.leiloesemcurso.values().iterator();      
         while(it.hasNext()){
           Leilao l = (Leilao) it.next();
           sb.append(l.getDetalhes());
           if(l.getMaiorUti().equals(utilizador)) sb.append("Actualmente tem a maior oferta!\n");
           else if(l.getDono().equals(utilizador)) sb.append("É o dono!\n");
-        }
-        return sb.toString();
+        }        
     }
     finally{
-      this.lock.unlock();
-      
+      this.lock.unlock();      
     }
+    return sb.toString();
   }
 
     public int getIds() {
