@@ -2,12 +2,12 @@ package Servidor;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Leilao implements Serializable{
   private int id, maiorofer;
   private String descricao, maioruti, dono, ultimouti;
+  protected Condition maiorOferta;
 
   public Leilao(int id, String dono, String descricao){
     this.id = id;
@@ -16,6 +16,7 @@ public class Leilao implements Serializable{
     this.maiorofer = 0;
     this.maioruti = "";
     this.ultimouti = "";
+    this.maiorOferta = this.lock.newCondition();
   }
 
   public Leilao(Leilao l){
@@ -25,6 +26,7 @@ public class Leilao implements Serializable{
     this.maiorofer = l.getMaiorOferta();
     this.maioruti = l.getMaiorUti();
     this.ultimouti = l.getUltimoUti();
+    this.maiorOferta = this.lock.newCondition();
   }
 
   public int getId(){

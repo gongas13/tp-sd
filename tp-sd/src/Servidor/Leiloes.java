@@ -8,8 +8,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Leiloes implements Serializable{
-  private ReentrantLock lock;
-  private Condition maiorOferta;
+  protected ReentrantLock lock;
   private int ids;
   private HashMap<Integer,Leilao> leiloesemcurso;
   private HashMap<Integer,Leilao> leiloesterminados;
@@ -25,6 +24,12 @@ public class Leiloes implements Serializable{
     this.lock = new ReentrantLock();
     this.leiloesemcurso = l.getLeiloesEmCurso();
     this.leiloesterminados = l.getLeiloesTerminados();
+  }
+
+  private Leilao getLeilao(Integer id){
+    if(this.leiloesemcurso.containsKey(id)){
+      return this.leiloesemcurso.
+    }
   }
 
   public void inserirLeilao(Utilizador utilizador, String descricao){
@@ -43,14 +48,22 @@ public class Leiloes implements Serializable{
         String resp = "Utilizador não é dono deste leilão";
         if (utilizador.temLeilao(id)) {
           this.lock.lock();
+          Leilao aux;
+          boolean flag;
+
           try{
-            StringBuilder sb = new StringBuilder();
-            Leilao aux = this.leiloesemcurso.remove(id);
-            this.leiloesterminados.put(id,aux);
-            sb.append(aux.toString());
-            resp = sb.toString();
+            if(flag = this.leiloesemcurso.containsKey(id)){
+              StringBuilder sb = new StringBuilder();
+              aux = this.leiloesemcurso.remove(id);
+              this.leiloesterminados.put(id,aux);
+              sb.append(aux.toString());
+              resp = sb.toString();
+            }
           }
           finally{
+            if(flag){
+              aux.maiorOferta.signalAll();
+            }
             this.lock.unlock();
           }
         }
@@ -60,15 +73,28 @@ public class Leiloes implements Serializable{
   public String licitar(int id, Utilizador utilizador, int oferta){
     this.lock.lock();
     String aux;
-    try{      
-      Leilao l = this.leiloesemcurso.get(id);
-      if(l.getMaiorOferta() < oferta) aux = "A oferta tem de ser maior que a existente\n";
-      else {
-        l.insereLicitacao(oferta,utilizador.getUsername());
-        aux = "Inserido com sucesso";
-      }      
+    boolean flag;
+    Leilao l;
+    try{
+      if(flag = this.leiloesemcurso.containsKey(id)){
+        l = this.leiloesemcurso.get(id);
+        if(flag = (l.getMaiorOferta() < oferta)) aux = "A oferta tem de ser maior que a existente\n";
+        else {
+          l.insereLicitacao(oferta,utilizador.getUsername());
+        }
+      }
     }
     finally{
+      if(flag){
+        l.maiorOferta.await();
+        if(this.leiloesterminados.containsKey(id)){
+          aux = "O leilão terminou com a sua licitação de " + oferta + " a vencer.\n ";
+        }
+        else{
+          aux = "A sua oferta no item "+id+" foi ultrapassada.\n ";
+        }
+      }
+
       this.lock.unlock();
     }
     return aux;
@@ -78,16 +104,16 @@ public class Leiloes implements Serializable{
     this.lock.lock();
     StringBuilder sb = new StringBuilder();
     try{
-      Iterator it = this.leiloesemcurso.values().iterator();      
+      Iterator it = this.leiloesemcurso.values().iterator();
         while(it.hasNext()){
           Leilao l = (Leilao) it.next();
           sb.append(l.getDetalhes());
           if(l.getMaiorUti().equals(utilizador)) sb.append("Actualmente tem a maior oferta!\n");
           else if(l.getDono().equals(utilizador)) sb.append("É o dono!\n");
-        }        
+        }
     }
     finally{
-      this.lock.unlock();      
+      this.lock.unlock();
     }
     return sb.toString();
   }
@@ -135,8 +161,8 @@ public class Leiloes implements Serializable{
         }
         return true;
     }
-    
-    
 
- 
+
+
+
 }

@@ -39,7 +39,7 @@ public class ServidorThread extends Thread {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                
+
                 if (line.equals("login")) {
                     String username = (String) in.readObject();
                     String password = (String) in.readObject();
@@ -61,7 +61,7 @@ public class ServidorThread extends Thread {
                     if (logged)
                         resp = "logado";
                     out.writeObject(resp);
-                }                
+                }
 
                 if (line.equals("registo")) {
                     String username = (String) in.readObject();
@@ -72,7 +72,7 @@ public class ServidorThread extends Thread {
                         this.users.registarUtilizador(username, password);
                         resposta = "sucesso";
                         this.utilizador = this.users.getUtilizador(username);
-                        
+
 
 
                     } catch (UtilizadorJaRegistadoException e) {
@@ -91,7 +91,7 @@ public class ServidorThread extends Thread {
                     int idleilao = in.readInt();
                     int valor = in.readInt();
 
-                    response = this.leiloes.licitar(idleilao, this.utilizador, valor);
+                    this.leiloes.licitar(idleilao, this.utilizador, valor, response);
 
                     out.writeObject(response);
                 }
@@ -99,8 +99,8 @@ public class ServidorThread extends Thread {
                 if (line.equals("consultar")) {
                     out.writeObject(this.leiloes.listarEmCurso(line));
                 }
-                
-                
+
+
                 if (line.equals("mudarpassword")) {
                     String newpassword = in.readLine();
                     this.utilizador.setPassword(newpassword);
@@ -108,27 +108,18 @@ public class ServidorThread extends Thread {
                 }
 
                 if (line.equals("criar")) {
-                    String detalhes; 
+                    String detalhes;
                     detalhes = in.readLine();
-                    
+
                     this.leiloes.inserirLeilao(this.utilizador, detalhes);
                 }
-                
+
                 if (line.equals("terminar")) {
                     int id = in.readInt();
                     String resp;
                     resp = this.leiloes.fecharLeilao(id, utilizador);
                     out.writeObject(resp);
                 }
-                    
-                    
-                    
-                /*if (line.equals("alterar")) {
-                String detalhes;
-                detalhes = in.readLine();
-                
-                this.leiloes.inserirLeilao(this.user, detalhes);
-                }*/
             }
         } catch (IOException e) {
             e.printStackTrace();
