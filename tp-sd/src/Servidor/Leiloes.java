@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Leiloes implements Serializable{
@@ -96,11 +97,11 @@ public class Leiloes implements Serializable{
         return ids;
     }
 
-    public HashMap<Integer, Leilao> getLeiloesemcurso() {
+    public HashMap<Integer, Leilao> getLeiloesEmCurso() {
         return leiloesemcurso;
     }
 
-    public HashMap<Integer, Leilao> getLeiloesterminados() {
+    public HashMap<Integer, Leilao> getLeiloesTerminados() {
         return leiloesterminados;
     }
 

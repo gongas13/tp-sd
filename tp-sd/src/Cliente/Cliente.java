@@ -18,7 +18,7 @@ public class Cliente extends Thread {
 
     public void run() {
         try {
-            Socket socket = new Socket("localhost",6063);
+            Socket socket = new Socket("localhost",12345);
 
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();

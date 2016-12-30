@@ -27,7 +27,7 @@ public class ClienteApp {
         this.in = in;
     };
 
-    private static Menu menuInit,menuLoggedIn, menuLoggedInVendedor;
+    private static Menu menuInit,menuLoggedIn, menuLoggedInVendedor, menuChoose;
 
 
     public static void carregarMenus(){
@@ -59,7 +59,7 @@ public class ClienteApp {
         menuInit = new Menu(minit);
         menuLoggedIn = new Menu(mLogged);
         menuLoggedInVendedor = new Menu (mLoggedVendedor);
-        menuInit = new Menu (mChoose);
+        menuChoose = new Menu (mChoose);
     }
     
     
@@ -117,14 +117,14 @@ public class ClienteApp {
     
     public void initMenuChoose(){
         do{
-            menuInit.executa();
-            switch (menuInit.getOpcao()){
+            menuChoose.executa();
+            switch (menuChoose.getOpcao()){
                 case 1: initMenuComprador();
                     break;
                 case 2: initMenuVendedor();
                     break;
             }
-        } while (menuInit.getOpcao()!=0);
+        } while (menuChoose.getOpcao()!=0);
     }
     
     public void registaCliente(){
@@ -147,7 +147,7 @@ public class ClienteApp {
             if(response.equals("sucesso")){
                 System.out.println("Registo feito com sucesso!");
                 System.out.println("Logado com sucesso");
-                initMenuComprador();
+                initMenuChoose();
             }
             if(response.equals("jaregistado")){
                 System.out.println("Utilizador já registado");
