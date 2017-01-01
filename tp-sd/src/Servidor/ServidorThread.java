@@ -35,55 +35,58 @@ public class ServidorThread extends Thread {
             while (true) {
                 String line = null;
                 try {
-                    line = (String) in.readObject();
+                    line = (String) in.readObject();                    
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }    
 
                 if (line.equals("login")) {
                     String username = (String) in.readObject();
                     String password = (String) in.readObject();
                     String resp = "insucesso";
-                    Boolean logged = false;
-                    System.out.println(this.utilizador.getClass());
+                    Boolean logged = false;                    
                     try {
-                        logged = this.users.login(username, password);
-                        this.utilizador = this.users.getUtilizador(username);
-                        System.out.println(this.utilizador.getClass());
-                    } catch (UtilizadorNaoExisteException e) {
-                        resp = "utilizadornaoexiste";
-                    } catch (PasswordErradaException e) {
-                        resp = "passworderrada";
+                        Thread wt = new WorkerThread(out,users,leiloes,line,username,password);
+                        wt.start();                    
                     } catch (Exception e) {
                         System.out.println("Erro!");
                         e.printStackTrace();
+                    }   
+                    finally{
+                        Thread.sleep(1000);
+                        if(this.users.existeUtilizador(username)){
+                            try{
+                                this.utilizador = this.users.getUtilizador(username);
+                            }catch (UtilizadorNaoExisteException e) {
+                                System.out.println("Erro!");
+                                e.printStackTrace();
+                            }
+                        }
                     }
-                    if (logged)
-                        resp = "logado";
-                    out.writeObject(resp);
                 }
 
                 if (line.equals("registo")) {
                     String username = (String) in.readObject();
                     String password = (String) in.readObject();
-                    String resposta;
 
                     try {
-                        this.users.registarUtilizador(username, password);
-                        resposta = "sucesso";
-                        this.utilizador = this.users.getUtilizador(username);
-
-
-
-                    } catch (UtilizadorJaRegistadoException e) {
-                        resposta = "jaregistado";
-                    } catch (UtilizadorNaoExisteException e) {
-                        resposta = "utilizadornaoexiste";
-                    } catch (Exception e) {
-                        resposta = "erro";
+                        Thread wt = new WorkerThread(out,users,leiloes,line,username,password);
+                        wt.start();                        
+                    }catch (Exception e) {
+                        System.out.println("Erro!");
+                        e.printStackTrace();
                     }
-
-                    out.writeObject(resposta);
+                    finally{
+                        Thread.sleep(1000);
+                        if(this.users.existeUtilizador(username)){
+                            try{
+                                this.utilizador = this.users.getUtilizador(username);
+                            }catch (UtilizadorNaoExisteException e) {
+                                System.out.println("Erro!");
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
 
                 if (line.equals("licitar")) {
@@ -91,40 +94,67 @@ public class ServidorThread extends Thread {
                     int idleilao = in.readInt();
                     int valor = in.readInt();
 
-                    this.leiloes.licitar(idleilao, this.utilizador, valor, response);
-
-                    out.writeObject(response);
+                    try {
+                        Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),idleilao,valor);
+                        wt.start();                        
+                    }catch (Exception e) {
+                        System.out.println("Erro!");
+                        e.printStackTrace();
+                    }
                 }
 
                 if (line.equals("consultar")) {
-                    out.writeObject(this.leiloes.listarEmCurso(line));
+                    try {
+                        Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername());
+                        wt.start();                        
+                    }catch (Exception e) {
+                        System.out.println("Erro!");
+                        e.printStackTrace();
+                    }
                 }
 
 
                 if (line.equals("mudarpassword")) {
                     String newpassword = in.readLine();
-                    this.utilizador.setPassword(newpassword);
-                    out.writeObject("sucesso");
+                    try {
+                        Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),newpassword);
+                        wt.start();                        
+                    }catch (Exception e) {
+                        System.out.println("Erro!");
+                        e.printStackTrace();
+                    }
                 }
 
                 if (line.equals("criar")) {
                     String detalhes;
                     detalhes = in.readLine();
-
-                    this.leiloes.inserirLeilao(this.utilizador, detalhes);
+                    try {
+                        Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),detalhes);
+                        wt.start();                        
+                    }catch (Exception e) {
+                        System.out.println("Erro!");
+                        e.printStackTrace();
+                    }
                 }
 
                 if (line.equals("terminar")) {
-                    int id = in.readInt();
-                    String resp;
-                    resp = this.leiloes.fecharLeilao(id, utilizador);
-                    out.writeObject(resp);
+                    int id = in.readInt();                    
+                    try {
+                        Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),id);
+                        wt.start();                        
+                    }catch (Exception e) {
+                        System.out.println("Erro!");
+                        e.printStackTrace();
+                    }
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }catch(InterruptedException e){
+            e.printStackTrace();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ServidorThread.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }      
     }
 }

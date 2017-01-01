@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import Servidor.Leilao;
 
 public class Leiloes implements Serializable{
   protected ReentrantLock lock;
@@ -26,38 +26,33 @@ public class Leiloes implements Serializable{
     this.leiloesterminados = l.getLeiloesTerminados();
   }
 
-  private Leilao getLeilao(Integer id){
-    if(this.leiloesemcurso.containsKey(id)){
-      return this.leiloesemcurso.
-    }
-  }
-
-  public void inserirLeilao(Utilizador utilizador, String descricao){
+  public void inserirLeilao(String utilizador, String descricao){
     this.lock.lock();
     try{
-      Leilao l = new Leilao(this.ids, utilizador.getUsername(), descricao);
-      this.leiloesemcurso.put(this.ids++,l);
-      utilizador.adicionarLeilao(ids);
+      Leilao l = new Leilao(this.ids, utilizador, descricao, lock);
+      this.leiloesemcurso.put(this.ids++,l);      
     }
     finally{
       this.lock.unlock();
     }
   }
 
-    public String fecharLeilao(int id, Utilizador utilizador){
-        String resp = "Utilizador não é dono deste leilão";
-        if (utilizador.temLeilao(id)) {
+    public String fecharLeilao(int id, String utilizador){
+        String resp = "Utilizador não é dono deste leilão";        
           this.lock.lock();
-          Leilao aux;
-          boolean flag;
+          Leilao aux = null;
+          boolean flag = false;
 
           try{
             if(flag = this.leiloesemcurso.containsKey(id)){
               StringBuilder sb = new StringBuilder();
-              aux = this.leiloesemcurso.remove(id);
-              this.leiloesterminados.put(id,aux);
-              sb.append(aux.toString());
-              resp = sb.toString();
+              aux = this.leiloesemcurso.get(id);
+              if(aux.getDono().equals(utilizador)){
+                this.leiloesemcurso.remove(id);
+                this.leiloesterminados.put(id,aux);
+                sb.append(aux.toString());
+                resp = sb.toString();
+              }
             }
           }
           finally{
@@ -65,16 +60,15 @@ public class Leiloes implements Serializable{
               aux.maiorOferta.signalAll();
             }
             this.lock.unlock();
-          }
-        }
+          }        
         return resp;
     }
 
   public String licitar(int id, Utilizador utilizador, int oferta){
     this.lock.lock();
-    String aux;
-    boolean flag;
-    Leilao l;
+    String aux = "";
+    boolean flag = false;
+    Leilao l = null;
     try{
       if(flag = this.leiloesemcurso.containsKey(id)){
         l = this.leiloesemcurso.get(id);
@@ -85,16 +79,18 @@ public class Leiloes implements Serializable{
       }
     }
     finally{
-      if(flag){
-        l.maiorOferta.await();
-        if(this.leiloesterminados.containsKey(id)){
-          aux = "O leilão terminou com a sua licitação de " + oferta + " a vencer.\n ";
-        }
-        else{
-          aux = "A sua oferta no item "+id+" foi ultrapassada.\n ";
+      try{
+        if(flag){
+            l.maiorOferta.await();
+            if(this.leiloesterminados.containsKey(id)){
+              aux = "O leilão terminou com a sua licitação de " + oferta + " a vencer.\n ";
+            }
+            else{
+              aux = "A sua oferta no item "+id+" foi ultrapassada.\n ";
+            }
         }
       }
-
+      catch(InterruptedException e) {}
       this.lock.unlock();
     }
     return aux;
@@ -132,7 +128,7 @@ public class Leiloes implements Serializable{
 
     @Override
     public String toString() {
-        return "Leiloes{" + "lock=" + lock + ", maiorOferta=" + maiorOferta + ", ids=" + ids + ", leiloesemcurso=" + leiloesemcurso + ", leiloesterminados=" + leiloesterminados + '}';
+        return "Leiloes{ids=" + ids + ", leiloesemcurso=" + leiloesemcurso + ", leiloesterminados=" + leiloesterminados + '}';
     }
 
     @Override
@@ -148,9 +144,6 @@ public class Leiloes implements Serializable{
         }
         final Leiloes other = (Leiloes) obj;
         if (this.ids != other.ids) {
-            return false;
-        }
-        if (!Objects.equals(this.maiorOferta, other.maiorOferta)) {
             return false;
         }
         if (!Objects.equals(this.leiloesemcurso, other.leiloesemcurso)) {

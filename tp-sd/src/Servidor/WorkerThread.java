@@ -8,52 +8,66 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class WorkerThread extends Thread{
-  private Socket socket;
+public class WorkerThread extends Thread{  
   private Utilizador utilizador;
   private Leiloes leiloes;
   private Utilizadores users;
-  private String line;
+  private String line,user,pass;
+  private int id,valor;  
+  private ObjectOutputStream out;
 
-  public WorkerThread(Socket socket, Utilizadores users, Leiloes leiloes, String line){
-      this.socket = socket;
+  public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user){      
       this.users = users;
       this.leiloes = leiloes;
       this.line = line;
+      this.user = user;
+      this.out = out;
+  }
+  
+  public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user, String pass){
+      this.out = out;
+      this.users = users;
+      this.leiloes = leiloes;
+      this.line = line;
+      this.user = user;
+      this.pass = pass;
+  }
+  
+  public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user, int id){
+      this.out = out;
+      this.users = users;
+      this.leiloes = leiloes;
+      this.line = line;
+      this.user = user;
+      this.id = id;
+  }
+  
+  public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user, int id, int valor){
+      this.out = out;
+      this.users = users;
+      this.leiloes = leiloes;
+      this.line = line;
+      this.user = user;
+      this.id = id;
+      this.valor = valor;
   }
 
   @Override
   public void run() {
-    try {
-      ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
-      out.flush();
-      ObjectInput in = new ObjectInputStream(this.socket.getInputStream());
-
-      while (true) {
-        String line = null;
-        try {
-            line = (String) in.readObject();
-            Thread wt = new WorkerThread(socket,users,leiloes,line);
-            wt.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }  
-
+    try {            
+      String resp = "";
+      out.flush();     
+      
         if (line.equals("login")) {
-            String username = (String) in.readObject();
-            String password = (String) in.readObject();
-            String resp = "insucesso";
-            Boolean logged = false;
-            System.out.println(this.utilizador.getClass());
+            boolean logged = false;
             try {
-                logged = this.users.login(username, password);
-                this.utilizador = this.users.getUtilizador(username);
-                System.out.println(this.utilizador.getClass());
+                logged = this.users.login(this.user, this.pass);
+                this.utilizador = this.users.getUtilizador(this.user);                
             } catch (UtilizadorNaoExisteException e) {
                 resp = "utilizadornaoexiste";
             } catch (PasswordErradaException e) {
                 resp = "passworderrada";
-            } catch (Exception e) {
+            }catch (Exception e) {
                 System.out.println("Erro!");
                 e.printStackTrace();
             }
@@ -62,65 +76,40 @@ public class WorkerThread extends Thread{
             out.writeObject(resp);
         }
 
-        if (line.equals("registo")) {
-            String username = (String) in.readObject();
-            String password = (String) in.readObject();
-            String resposta;
-
+        if (line.equals("registo")){
+            System.out.println("REGISTO SV " + this.user +" "+ this.pass+"\n");
             try {
-                this.users.registarUtilizador(username, password);
-                resposta = "sucesso";
-                this.utilizador = this.users.getUtilizador(username);
+                this.users.registarUtilizador(this.user, this.pass);
+                resp = "sucesso";                
             } catch (UtilizadorJaRegistadoException e) {
-                resposta = "jaregistado";
-            } catch (UtilizadorNaoExisteException e) {
-                resposta = "utilizadornaoexiste";
+                resp = "jaregistado";            
             } catch (Exception e) {
-                resposta = "erro";
+                resp = "erro";
             }
 
-            out.writeObject(resposta);
+            out.writeObject(resp);
         }
 
         if (line.equals("licitar")) {
-            String response;
-            int idleilao = in.readInt();
-            int valor = in.readInt();
-
-            response = this.leiloes.licitar(idleilao, this.utilizador, valor);
-
-            out.writeObject(response);
+            resp = this.leiloes.licitar(this.id, this.utilizador, this.valor);
+            out.writeObject(resp);
         }
 
         if (line.equals("consultar")) {
             out.writeObject(this.leiloes.listarEmCurso(line));
         }
 
-
-        if (line.equals("mudarpassword")) {
-            String newpassword = in.readLine();
-            this.utilizador.setPassword(newpassword);
-            out.writeObject("sucesso");
-        }
-
         if (line.equals("criar")) {
-            String detalhes;
-            detalhes = in.readLine();
-
-            this.leiloes.inserirLeilao(this.utilizador, detalhes);
+            this.leiloes.inserirLeilao(this.user, this.pass);
         }
 
         if (line.equals("terminar")) {
-            int id = in.readInt();
-            String resp;
-            resp = this.leiloes.fecharLeilao(id, utilizador);
+
+            resp = this.leiloes.fecharLeilao(this.id, this.user);
             out.writeObject(resp);
         }
-      }
     }catch (IOException e) {
       e.printStackTrace();
-    }catch (ClassNotFoundException ex) {
-      Logger.getLogger(WorkerThread.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
 }

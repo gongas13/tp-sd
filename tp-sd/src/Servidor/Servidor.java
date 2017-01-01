@@ -22,14 +22,19 @@ public class Servidor {
     public static void main(String[] args) {
         try{
             Servidor.servidorSocket = new ServerSocket(12345);
-
-
+            users = new Utilizadores();
+            leiloes = new Leiloes();
+            try{
+                users.registarUtilizador("mets", "22");
+                users.registarUtilizador("1", "22");
+                users.registarUtilizador("2", "22");
+                users.registarUtilizador("3", "22");
+            }
+            catch(UtilizadorJaRegistadoException e) {}
             System.out.println("Servidor criado!");
             while (true){
                 try {
-                    Socket socket = servidorSocket.accept();
-                    users = new Utilizadores();
-                    leiloes = new Leiloes();
+                    Socket socket = servidorSocket.accept();                    
                     Thread servidorThread = new ServidorThread(socket,users,leiloes);
 
                     System.out.println("Ligacão aceite!");

@@ -108,6 +108,10 @@ public class Utilizadores implements Serializable{
         }
     }
 
+    public boolean existeUtilizador(String username){
+        return this.utilizadores.containsKey(username);
+    }
+    
     public Utilizador getUtilizador(String username) throws UtilizadorNaoExisteException{
         this.lock.lock();
 

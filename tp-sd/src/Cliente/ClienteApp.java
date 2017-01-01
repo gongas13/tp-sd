@@ -6,6 +6,7 @@
 package Cliente;
 
 import java.io.IOException;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -92,6 +93,7 @@ public class ClienteApp {
         try{
             ClienteApp.out.writeObject("login");
 
+            System.out.println("Cheguei");
             out.writeObject(username);
             out.writeObject(password);
 
@@ -136,6 +138,7 @@ public class ClienteApp {
         System.out.print("Password:");
         password = input.nextLine();
 
+        System.out.println("lol\n");
         try{
             ClienteApp.out.writeObject("registo");
 
@@ -157,7 +160,7 @@ public class ClienteApp {
             }
 
         } catch (IOException e){
-            System.out.println("Não foi possível obter ligação ao servidor!");
+            System.out.println(e.toString()+"\nNão foi possível obter ligação ao servidor!");
         } catch (ClassNotFoundException e){
             System.out.println("Erro nos dados recebidos");
         }
