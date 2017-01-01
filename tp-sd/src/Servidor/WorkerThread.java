@@ -99,12 +99,14 @@ public class WorkerThread extends Thread{
             out.writeObject(this.leiloes.listarEmCurso(line));
         }
 
-        if (line.equals("criar")) {
+        if (line.equals("criar")){             
+            resp = "Inserido com sucesso";
             this.leiloes.inserirLeilao(this.user, this.pass);
+            out.writeObject(resp);
         }
 
         if (line.equals("terminar")) {
-
+            
             resp = this.leiloes.fecharLeilao(this.id, this.user);
             out.writeObject(resp);
         }

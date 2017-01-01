@@ -89,8 +89,7 @@ public class ServidorThread extends Thread {
                     }
                 }
 
-                if (line.equals("licitar")) {
-                    String response;
+                if (line.equals("licitar")) {                    
                     int idleilao = in.readInt();
                     int valor = in.readInt();
 
@@ -115,7 +114,7 @@ public class ServidorThread extends Thread {
 
 
                 if (line.equals("mudarpassword")) {
-                    String newpassword = in.readLine();
+                    String newpassword = (String) in.readObject();
                     try {
                         Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),newpassword);
                         wt.start();                        
@@ -127,7 +126,8 @@ public class ServidorThread extends Thread {
 
                 if (line.equals("criar")) {
                     String detalhes;
-                    detalhes = in.readLine();
+                    detalhes = (String) in.readObject();
+                    System.out.println(detalhes+"\n");
                     try {
                         Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),detalhes);
                         wt.start();                        
