@@ -115,7 +115,7 @@ public class WorkerThread extends Thread{
 
         if (line.equals("criar")){             
             resp = "Inserido com sucesso";
-            this.leiloes.inserirLeilao(this.user, this.pass);
+            this.leiloes.inserirLeilao(this.utilizador, this.pass);
             out.writeObject(resp);
         }
 

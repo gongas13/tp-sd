@@ -67,7 +67,6 @@ public class Utilizador {
             sb.append(" foi ultrapassada!! ");
             
             this.mensagens.addFirst(resp);
-        
         }
         
         public void terminou(int leilao, String vencedor, float valor){

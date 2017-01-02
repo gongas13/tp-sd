@@ -25,7 +25,7 @@ public class Leiloes implements Serializable{
     this.leiloesterminados = l.getLeiloesTerminados();
   }
 
-  public void inserirLeilao(String utilizador, String descricao){
+  public void inserirLeilao(Utilizador utilizador, String descricao){
     this.lock.lock();
     try{
       Leilao l = new Leilao(this.ids, utilizador, descricao, lock);
@@ -46,7 +46,7 @@ public class Leiloes implements Serializable{
           if(flag = this.leiloesemcurso.containsKey(id)){
             StringBuilder sb = new StringBuilder();
             aux = this.leiloesemcurso.get(id);
-            if(aux.getDono().equals(utilizador)){
+            if(aux.getDono().getUsername().equals(utilizador)){
               this.leiloesemcurso.remove(id);
               this.leiloesterminados.put(id,aux);
               sb.append(aux.toString());
@@ -86,7 +86,7 @@ public class Leiloes implements Serializable{
         l = this.leiloesemcurso.get(id);
         if(flag = (l.getMaiorOferta() > oferta)) aux = "A oferta tem de ser maior que a existente\n";
         else {
-          l.insereLicitacao(oferta,utilizador.getUsername());
+          l.insereLicitacao(oferta,utilizador);
         }
       }
     }

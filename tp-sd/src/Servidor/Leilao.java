@@ -1,6 +1,7 @@
 package Servidor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
@@ -9,11 +10,12 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Leilao implements Serializable{
   private int id;
   private float maiorofer;
-  private String descricao, maioruti, dono, ultimouti;
+  private Utilizador dono;
+  private String descricao, maioruti, ultimouti;
   private List<Utilizador> utilizadores;
   protected Condition maiorOferta;
 
-  public Leilao(int id, String dono, String descricao, ReentrantLock lock){
+  public Leilao(int id, Utilizador dono, String descricao, ReentrantLock lock){
     this.id = id;
     this.dono = dono;
     this.descricao = descricao;
@@ -21,6 +23,7 @@ public class Leilao implements Serializable{
     this.maioruti = "";
     this.ultimouti = "";
     this.maiorOferta = lock.newCondition();
+    this.utilizadores = new ArrayList<>();
   }
 
   public Leilao(Leilao l){
@@ -37,7 +40,7 @@ public class Leilao implements Serializable{
     return this.id;
   }
 
-  public String getDono(){
+  public Utilizador getDono(){
     return this.dono;
   }
 
@@ -49,11 +52,12 @@ public class Leilao implements Serializable{
     return this.ultimouti;
   }
 
-  public void insereLicitacao(float oferta, String nome){
+  public void insereLicitacao(float oferta, Utilizador utilizador){
     if(oferta>this.maiorofer) {
       this.ultimouti = this.maioruti;
       this.maiorofer = oferta;
-      this.maioruti = nome;
+      this.maioruti = utilizador.getUsername();
+      this.utilizadores.add(utilizador);
     }
   }
 

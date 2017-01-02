@@ -32,19 +32,19 @@ public class LeilaoThread extends Thread {
             Socket socket = this.utilizador.getSocket();
             
             if(socket!=null){
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-            
-            String msg="";
-            StringBuilder sb = new StringBuilder(msg);
-            sb.append("O leilão ");
-            sb.append(this.leilao.getId());
-            sb.append("terminou, o vencedor foi");
-            sb.append(this.leilao.getMaiorUti());
-            sb.append("com uma licitação de €");
-            sb.append(this.leilao.getMaiorOferta());
-            
-            out.writeObject(msg);
+                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                out.flush();
+
+                String msg="";
+                StringBuilder sb = new StringBuilder(msg);
+                sb.append("1|O leilão ");
+                sb.append(this.leilao.getId());
+                sb.append("terminou, o vencedor foi");
+                sb.append(this.leilao.getMaiorUti());
+                sb.append("com uma licitação de €");
+                sb.append(this.leilao.getMaiorOferta());
+
+                out.writeObject(sb.toString());
             }else{
                 this.utilizador.terminou(this.leilao.getId(),this.leilao.getMaiorUti(),this.leilao.getMaiorOferta());
             }
