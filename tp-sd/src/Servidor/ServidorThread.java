@@ -39,14 +39,18 @@ public class ServidorThread extends Thread {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }    
-
+                
+                System.out.print("LINE: ");
+                System.out.println(line);
+                
                 if (line.equals("login")) {
+                    System.out.println("cheguei login");
                     String username = (String) in.readObject();
                     String password = (String) in.readObject();
                     String resp = "insucesso";
                     Boolean logged = false;                    
                     try {
-                        Thread wt = new WorkerThread(out,users,leiloes,line,username,password);
+                        Thread wt = new WorkerThread(out,users,leiloes,line,username,password, this.socket);
                         wt.start();                    
                     } catch (Exception e) {
                         System.out.println("Erro!");
@@ -70,7 +74,7 @@ public class ServidorThread extends Thread {
                     String password = (String) in.readObject();
 
                     try {
-                        Thread wt = new WorkerThread(out,users,leiloes,line,username,password);
+                        Thread wt = new WorkerThread(out,users,leiloes,line,username,password, this.socket);
                         wt.start();                        
                     }catch (Exception e) {
                         System.out.println("Erro!");
@@ -89,17 +93,21 @@ public class ServidorThread extends Thread {
                     }
                 }
 
-                if (line.equals("licitar")) {                    
-                    int idleilao = in.readInt();
-                    int valor = in.readInt();
-
-                    try {
-                        Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),idleilao,valor);
-                        wt.start();                        
+                if (line.equals("licitar")) {
+                    int idleilao = (int) in.readObject();
+                    System.out.println(idleilao);
+                    String resp;
+                    float valor = (float) in.readObject();
+                    System.out.println(valor);
+                    /* try {
+                    Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),idleilao,valor);
+                    wt.start();
                     }catch (Exception e) {
-                        System.out.println("Erro!");
-                        e.printStackTrace();
-                    }
+                    System.out.println("Erro!");
+                    e.printStackTrace();
+                    }*/
+                    resp = this.leiloes.licitar(idleilao, this.utilizador, valor);
+                    out.writeObject(resp);
                 }
 
                 if (line.equals("consultar")) {
@@ -138,7 +146,7 @@ public class ServidorThread extends Thread {
                 }
 
                 if (line.equals("terminar")) {
-                    int id = in.readInt();                    
+                    int id = (int) in.readObject();                    
                     try {
                         Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),id);
                         wt.start();                        

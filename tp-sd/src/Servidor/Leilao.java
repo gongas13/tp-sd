@@ -2,12 +2,15 @@ package Servidor;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Leilao implements Serializable{
-  private int id, maiorofer;
+  private int id;
+  private float maiorofer;
   private String descricao, maioruti, dono, ultimouti;
+  private List<Utilizador> utilizadores;
   protected Condition maiorOferta;
 
   public Leilao(int id, String dono, String descricao, ReentrantLock lock){
@@ -26,7 +29,8 @@ public class Leilao implements Serializable{
     this.descricao = l.getDescricao();
     this.maiorofer = l.getMaiorOferta();
     this.maioruti = l.getMaiorUti();
-    this.ultimouti = l.getUltimoUti();    
+    this.ultimouti = l.getUltimoUti();
+    this.utilizadores = l.getUtilizadores();
   }
 
   public int getId(){
@@ -45,7 +49,7 @@ public class Leilao implements Serializable{
     return this.ultimouti;
   }
 
-  public void insereLicitacao(int oferta, String nome){
+  public void insereLicitacao(float oferta, String nome){
     if(oferta>this.maiorofer) {
       this.ultimouti = this.maioruti;
       this.maiorofer = oferta;
@@ -53,7 +57,7 @@ public class Leilao implements Serializable{
     }
   }
 
-  public int getMaiorOferta(){
+  public float getMaiorOferta(){
     return this.maiorofer;
   }
 
@@ -73,6 +77,10 @@ public class Leilao implements Serializable{
 
     return sb.toString();
   }
+  
+    public List<Utilizador> getUtilizadores() {
+        return this.utilizadores;
+    }
 
   public String toString(){
     StringBuilder sb = new StringBuilder();
@@ -102,4 +110,6 @@ public class Leilao implements Serializable{
       return ((this.getId() == aux.getId()) && this.getDono().equals(aux.getDono()) && this.getDescricao().equals(aux.getDescricao()) && (this.getMaiorOferta() == aux.getMaiorOferta()) && this.getMaiorUti().equals(aux.getMaiorUti()) && this.getUltimoUti().equals(aux.getUltimoUti()));
     }
   }
+
+    
 }

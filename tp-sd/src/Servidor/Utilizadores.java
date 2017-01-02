@@ -126,11 +126,11 @@ public class Utilizadores implements Serializable{
 
 
 
-    public void registarUtilizador(String username, String password) throws UtilizadorJaRegistadoException
+    public void registarUtilizador(String username, String password, Socket socket) throws UtilizadorJaRegistadoException
     {
         this.lock.lock();
         try{
-            Utilizador u = new Utilizador(username,password);
+            Utilizador u = new Utilizador(username,password, socket);
             if(this.utilizadores.containsKey(username)){
                 throw new UtilizadorJaRegistadoException();
             }

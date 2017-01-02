@@ -195,8 +195,10 @@ public class ClienteApp {
 
         System.out.print("Leilão a licitar:");
         idleilao=input.nextInt();
+        System.out.println(idleilao);
         System.out.print("Valor da licitação:");
         valor=input.nextFloat();
+        System.out.println(valor);
 
         try{
             out.writeObject("licitar");

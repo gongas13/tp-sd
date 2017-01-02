@@ -25,10 +25,10 @@ public class Servidor {
             users = new Utilizadores();
             leiloes = new Leiloes();
             try{
-                users.registarUtilizador("mets", "22");
-                users.registarUtilizador("1", "22");
-                users.registarUtilizador("2", "22");
-                users.registarUtilizador("3", "22");
+                users.registarUtilizador("mets", "22", null);
+                users.registarUtilizador("1", "22",  null);
+                users.registarUtilizador("2", "22", null);
+                users.registarUtilizador("3", "22", null);
             }
             catch(UtilizadorJaRegistadoException e) {}
             System.out.println("Servidor criado!");

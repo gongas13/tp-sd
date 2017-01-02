@@ -13,8 +13,10 @@ public class WorkerThread extends Thread{
   private Leiloes leiloes;
   private Utilizadores users;
   private String line,user,pass;
-  private int id,valor;  
+  private int id;
+  private float valor;
   private ObjectOutputStream out;
+  private Socket socket;
 
   public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user){      
       this.users = users;
@@ -33,6 +35,16 @@ public class WorkerThread extends Thread{
       this.pass = pass;
   }
   
+  public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user, String pass, Socket socket){
+      this.out = out;
+      this.users = users;
+      this.leiloes = leiloes;
+      this.line = line;
+      this.user = user;
+      this.pass = pass;
+      this.socket = socket;
+  }
+  
   public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user, int id){
       this.out = out;
       this.users = users;
@@ -42,7 +54,7 @@ public class WorkerThread extends Thread{
       this.id = id;
   }
   
-  public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user, int id, int valor){
+  public WorkerThread(ObjectOutputStream out, Utilizadores users, Leiloes leiloes, String line, String user, int id, float valor){
       this.out = out;
       this.users = users;
       this.leiloes = leiloes;
@@ -62,7 +74,9 @@ public class WorkerThread extends Thread{
             boolean logged = false;
             try {
                 logged = this.users.login(this.user, this.pass);
-                this.utilizador = this.users.getUtilizador(this.user);                
+                this.utilizador = this.users.getUtilizador(this.user);
+                this.utilizador.atualizarSocket(socket);
+                
             } catch (UtilizadorNaoExisteException e) {
                 resp = "utilizadornaoexiste";
             } catch (PasswordErradaException e) {
@@ -79,7 +93,7 @@ public class WorkerThread extends Thread{
         if (line.equals("registo")){
             System.out.println("REGISTO SV " + this.user +" "+ this.pass+"\n");
             try {
-                this.users.registarUtilizador(this.user, this.pass);
+                this.users.registarUtilizador(this.user, this.pass, this.socket);
                 resp = "sucesso";                
             } catch (UtilizadorJaRegistadoException e) {
                 resp = "jaregistado";            
@@ -96,7 +110,7 @@ public class WorkerThread extends Thread{
         }
 
         if (line.equals("consultar")) {
-            out.writeObject(this.leiloes.listarEmCurso(line));
+            out.writeObject(this.leiloes.listarEmCurso(this.user));
         }
 
         if (line.equals("criar")){             

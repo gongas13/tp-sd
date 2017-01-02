@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
-import Servidor.Leilao;
 
 public class Leiloes implements Serializable{
   protected ReentrantLock lock;
@@ -39,32 +38,45 @@ public class Leiloes implements Serializable{
 
     public String fecharLeilao(int id, String utilizador){
         String resp = "Utilizador não é dono deste leilão";        
-          this.lock.lock();
-          Leilao aux = null;
-          boolean flag = false;
+        this.lock.lock();
+        Leilao aux = null;
+        boolean flag = false;
 
-          try{
-            if(flag = this.leiloesemcurso.containsKey(id)){
-              StringBuilder sb = new StringBuilder();
-              aux = this.leiloesemcurso.get(id);
-              if(aux.getDono().equals(utilizador)){
-                this.leiloesemcurso.remove(id);
-                this.leiloesterminados.put(id,aux);
-                sb.append(aux.toString());
-                resp = sb.toString();
-              }
+        try{
+          if(flag = this.leiloesemcurso.containsKey(id)){
+            StringBuilder sb = new StringBuilder();
+            aux = this.leiloesemcurso.get(id);
+            if(aux.getDono().equals(utilizador)){
+              this.leiloesemcurso.remove(id);
+              this.leiloesterminados.put(id,aux);
+              sb.append(aux.toString());
+              resp = sb.toString();
             }
           }
-          finally{
-            if(flag){
-              aux.maiorOferta.signalAll();
-            }
-            this.lock.unlock();
-          }        
+        }
+        finally{
+          this.lock.unlock();
+        }
+        float maior = aux.getMaiorOferta();
+        if (maior > 0) {
+            try {
+                for (Utilizador user : aux.getUtilizadores()) {
+                    if (user != null) {
+                        Thread notificacao = new LeilaoThread(user, aux);
+                        notificacao.start();
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Erro!");
+                e.printStackTrace();
+            }  
+        }
+        
+        
         return resp;
     }
 
-  public String licitar(int id, Utilizador utilizador, int oferta){
+  public String licitar(int id, Utilizador utilizador, float oferta){
     this.lock.lock();
     String aux = "";
     boolean flag = false;
@@ -72,25 +84,13 @@ public class Leiloes implements Serializable{
     try{
       if(flag = this.leiloesemcurso.containsKey(id)){
         l = this.leiloesemcurso.get(id);
-        if(flag = (l.getMaiorOferta() < oferta)) aux = "A oferta tem de ser maior que a existente\n";
+        if(flag = (l.getMaiorOferta() > oferta)) aux = "A oferta tem de ser maior que a existente\n";
         else {
           l.insereLicitacao(oferta,utilizador.getUsername());
         }
       }
     }
     finally{
-      try{
-        if(flag){
-            l.maiorOferta.await();
-            if(this.leiloesterminados.containsKey(id)){
-              aux = "O leilão terminou com a sua licitação de " + oferta + " a vencer.\n ";
-            }
-            else{
-              aux = "A sua oferta no item "+id+" foi ultrapassada.\n ";
-            }
-        }
-      }
-      catch(InterruptedException e) {}
       this.lock.unlock();
     }
     return aux;
@@ -105,7 +105,7 @@ public class Leiloes implements Serializable{
           Leilao l = (Leilao) it.next();
           sb.append(l.getDetalhes());
           if(l.getMaiorUti().equals(utilizador)) sb.append("Actualmente tem a maior oferta!\n");
-          else if(l.getDono().equals(utilizador)) sb.append("É o dono!\n");
+          if(l.getDono().equals(utilizador)) sb.append("É o dono!\n");
         }
     }
     finally{

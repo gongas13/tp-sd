@@ -5,6 +5,7 @@
  */
 package Servidor;
 
+import java.net.Socket;
 import java.util.*;
 
 /**
@@ -17,7 +18,7 @@ public class Utilizador {
         private String password;
         private List<Integer> leiloes;
         private LinkedList<String> mensagens;
-
+        private Socket socket;
         
         
         public Utilizador(){
@@ -28,11 +29,12 @@ public class Utilizador {
         }
     
     
-        public Utilizador(String username, String password){
+        public Utilizador(String username, String password, Socket socket){
             this.username = username;
             this.password = password;
             this.leiloes = new ArrayList<Integer>();
             this.mensagens = new LinkedList<String>();
+            this.socket = socket;
         }
         
         public Utilizador(Utilizador u){
@@ -40,6 +42,7 @@ public class Utilizador {
             this.password = u.getPassword();
             this.leiloes = u.getLeiloes();
             this.mensagens = new LinkedList<String>();
+            this.socket = u.getSocket();
         }
         
     
@@ -52,7 +55,9 @@ public class Utilizador {
 
         public  void setPassword(String password){this.password = password;}
         
-        
+        public Socket getSocket() {
+            return this.socket;
+        }
         
         public void ultrapassou(int leilao){
             String resp="";
@@ -86,6 +91,10 @@ public class Utilizador {
     
         public void adicionarLeilao(int id) {
             this.leiloes.add(id);
+        }
+        
+        public void atualizarSocket(Socket socket) {
+            this.socket = socket;
         }
         
         public List<Integer> getLeiloes() {
