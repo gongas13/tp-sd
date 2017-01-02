@@ -50,14 +50,12 @@ public class ClienteApp {
         String [] mLogged = {
                 "Licitar",
                 "Consultar Leilões",
-                "Mudar password"
         };
 
         String [] mLoggedVendedor = {
                 "Criar Leilão",
-                "Alterar detalhes do leilão",
                 "Terminar Leilão",
-                "Mudar passsword"
+                "Consultar Leilões",
         };
 
         menuInit = new Menu(minit);
@@ -185,8 +183,6 @@ public class ClienteApp {
                     break;
                 case 2:consultarLeiloes();
                     break;
-                case 3:mudarPassword();
-                    break;
             }
         } while (menuLoggedIn.getOpcao()!=0 && vendedor == 0);
     }
@@ -286,12 +282,9 @@ public class ClienteApp {
             switch (menuLoggedInVendedor.getOpcao()){
                 case 1:criarLeilao();
                     break;
-                case 2:alterarDetalhes();
-                    comprador=1;
+                case 2:terminarLeilao();
                     break;
-                case 3:terminarLeilao();
-                    break;
-                case 5:mudarPassword();
+                case 3:consultarLeiloes();
                     break;
             }
         } while (menuLoggedInVendedor.getOpcao()!=0 && comprador == 0);
@@ -324,54 +317,8 @@ public class ClienteApp {
         e.printStackTrace();
         }
     }
-
-    public void alterarDetalhes(){
-
-        Scanner input = new Scanner(System.in);
-        int idleilao;
-
-        System.out.print("Leilão a alterar:");
-        idleilao=input.nextInt();
-
-        try{
-            out.writeObject("alterar");
-
-            out.writeObject(idleilao);
-
-            boolean notificacao;
-            String resp;
-            do {
-                resp = (String) in.readObject();
-                String parts[] = resp.split("|");
-                if (parts[0].equals("1")) {
-                    System.out.println("Tem uma notificação:\n" + resp.substring(2));
-                    notificacao = true;
-                } else notificacao = false;                    
-            } while (notificacao == true);
-
-            System.out.println(resp);
-        } catch (IOException | ClassNotFoundException e){
-        e.printStackTrace();
-        }
-    }
-            
-            
-    /*public void alterarparaComprador(){
-    
-    try{
-    out.writeObject("sercomprador");
-    
-    String resp = (String) in.readObject();
-    
-    System.out.println(resp);
-    } catch (IOException | ClassNotFoundException e){
-    e.printStackTrace();
-    }
-    
-    }*/
             
     public void terminarLeilao(){
-
         Scanner input = new Scanner(System.in);
         int idleilao;
 
@@ -380,19 +327,14 @@ public class ClienteApp {
 
         try{
             out.writeObject("terminar");
-
             out.writeObject(idleilao);
 
             boolean notificacao;
             String resp;
             do {
                 resp = (String) in.readObject();
-                System.out.println(resp);
                 String parts[] = resp.split("|");
                 if (parts[0].equals("1")) {
-                    for (String part : parts) {
-                        System.out.println(part);
-                    }
                     System.out.println("Tem uma notificação:\n" + resp.substring(2));
                     notificacao = true;
                 } else notificacao = false;                    
@@ -402,10 +344,6 @@ public class ClienteApp {
         } catch (IOException | ClassNotFoundException e){
         e.printStackTrace();
         }
-
     }
-        
-        
-        
 }
 

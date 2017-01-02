@@ -25,11 +25,12 @@ public class Leiloes implements Serializable{
     this.leiloesterminados = l.getLeiloesTerminados();
   }
 
-  public void inserirLeilao(Utilizador utilizador, String descricao){
+  public int inserirLeilao(Utilizador utilizador, String descricao){
     this.lock.lock();
     try{
       Leilao l = new Leilao(this.ids, utilizador, descricao, lock);
-      this.leiloesemcurso.put(this.ids++,l);      
+      this.leiloesemcurso.put(this.ids,l);     
+      return this.ids++;
     }
     finally{
       this.lock.unlock();
@@ -105,7 +106,7 @@ public class Leiloes implements Serializable{
           Leilao l = (Leilao) it.next();
           sb.append(l.getDetalhes());
           if(l.getMaiorUti().equals(utilizador)) sb.append("Actualmente tem a maior oferta!\n");
-          if(l.getDono().equals(utilizador)) sb.append("É o dono!\n");
+          if(l.getDono().getUsername().equals(utilizador)) sb.append("É o dono!\n");
         }
     }
     finally{

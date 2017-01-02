@@ -115,9 +115,12 @@ public class ServidorThread extends Thread {
                     String detalhes, resp;
                     detalhes = (String) in.readObject();
                     System.out.println(detalhes+"\n");
-                    resp = "Inserido com sucesso";
-                    this.leiloes.inserirLeilao(this.utilizador, detalhes);
-                    out.writeObject(resp);
+                    resp = "Inserido com sucesso, id: ";
+                    int res = this.leiloes.inserirLeilao(this.utilizador, detalhes);
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(resp);
+                    sb.append(res);
+                    out.writeObject(sb.toString());
                 }
 
                 if (line.equals("terminar")) {
