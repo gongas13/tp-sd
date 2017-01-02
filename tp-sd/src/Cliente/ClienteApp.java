@@ -10,7 +10,11 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.locks.Condition;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -21,6 +25,7 @@ public class ClienteApp {
     private static ObjectOutputStream out;
     private static ObjectInputStream in;
     public static String username;
+    String mensagemServidor;
 
 
     public ClienteApp(ObjectOutputStream out, ObjectInputStream in){
@@ -45,14 +50,12 @@ public class ClienteApp {
         String [] mLogged = {
                 "Licitar",
                 "Consultar Leilões",
-                "Desejo ser Vendedor",
                 "Mudar password"
         };
 
         String [] mLoggedVendedor = {
                 "Criar Leilão",
                 "Alterar detalhes do leilão",
-                "Desejo voltar a ser comprador",
                 "Terminar Leilão",
                 "Mudar passsword"
         };
@@ -97,11 +100,13 @@ public class ClienteApp {
             out.writeObject(username);
             out.writeObject(password);
 
+            
             String response = (String) in.readObject();
 
             if(response.equals("logado")){
                 System.out.println("Logado com sucesso!");
                 initMenuChoose();
+                
             }
             if(response.equals("utilizadornaoexiste")){
                 System.out.println("Utilizador não registado");
@@ -127,6 +132,11 @@ public class ClienteApp {
                     break;
             }
         } while (menuChoose.getOpcao()!=0);
+        try {
+            out.writeObject("logout");
+        } catch (IOException ex) {
+            Logger.getLogger(ClienteApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void registaCliente(){
@@ -175,15 +185,10 @@ public class ClienteApp {
                     break;
                 case 2:consultarLeiloes();
                     break;
-                case 3:initMenuChoose();
-                    vendedor=1;
-                    break;
-                case 4:mudarPassword();
+                case 3:mudarPassword();
                     break;
             }
         } while (menuLoggedIn.getOpcao()!=0 && vendedor == 0);
-        System.out.println("Logout!");
-        if(vendedor ==1 )initMenuVendedor();
     }
     
 
@@ -202,14 +207,12 @@ public class ClienteApp {
 
         try{
             out.writeObject("licitar");
-
             out.writeObject(idleilao);
             out.writeObject(valor);
 
             String resp = (String) in.readObject();
 
             System.out.println(resp);
-
         }catch (IOException | ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -258,18 +261,12 @@ public class ClienteApp {
                 case 2:alterarDetalhes();
                     comprador=1;
                     break;
-                case 3:initMenuChoose();
-                    break;
-                case 4:terminarLeilao();
+                case 3:terminarLeilao();
                     break;
                 case 5:mudarPassword();
                     break;
             }
         } while (menuLoggedInVendedor.getOpcao()!=0 && comprador == 0);
-        System.out.println("Logout!");
-        if(comprador==1){
-            initMenuComprador();
-        }
     }
         
             
