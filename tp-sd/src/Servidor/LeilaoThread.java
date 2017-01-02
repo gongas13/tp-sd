@@ -29,11 +29,9 @@ public class LeilaoThread extends Thread {
     public void run(){
         try{
             
-            Socket socket = this.utilizador.getSocket();
+            ObjectOutputStream out = this.utilizador.getOos();
             
-            if(socket!=null){
-                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                out.flush();
+            if(out!=null){
 
                 String msg="";
                 StringBuilder sb = new StringBuilder(msg);

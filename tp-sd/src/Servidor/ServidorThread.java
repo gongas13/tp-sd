@@ -49,7 +49,7 @@ public class ServidorThread extends Thread {
                     try {
                         logged = this.users.login(username, password);
                         this.utilizador = this.users.getUtilizador(username);
-                        this.utilizador.atualizarSocket(socket);
+                        this.utilizador.atualizarOos(out);
 
                     } catch (UtilizadorNaoExisteException e) {
                         resp = "utilizadornaoexiste";
@@ -78,7 +78,7 @@ public class ServidorThread extends Thread {
                     String resp;
                     System.out.println("REGISTO SV " + username +" "+ password +"\n");
                     try {
-                        this.users.registarUtilizador(username, password, this.socket);
+                        this.users.registarUtilizador(username, password, out);
                         resp = "sucesso";                
                     } catch (UtilizadorJaRegistadoException e) {
                         resp = "jaregistado";            
@@ -140,7 +140,7 @@ public class ServidorThread extends Thread {
                 }
                 
                 if (line.equals("logout")) {
-                    this.utilizador.atualizarSocket(null);
+                    this.utilizador.atualizarOos(null);
                 }
 
             }
