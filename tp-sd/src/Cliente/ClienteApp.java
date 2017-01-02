@@ -216,7 +216,7 @@ public class ClienteApp {
                 resp = (String) in.readObject();
                 String parts[] = resp.split("|");
                 if (parts[0].equals("1")) {
-                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    System.out.println("Tem uma notificação:\n" + resp.substring(2));
                     notificacao = true;
                 } else notificacao = false;                    
             } while (notificacao == true);
@@ -268,7 +268,7 @@ public class ClienteApp {
                 resp = (String) in.readObject();
                 String parts[] = resp.split("|");
                 if (parts[0].equals("1")) {
-                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    System.out.println("Tem uma notificação:\n" + resp.substring(2));
                     notificacao = true;
                 } else notificacao = false;                    
             } while (notificacao == true);
@@ -313,7 +313,7 @@ public class ClienteApp {
                 resp = (String) in.readObject();
                 String parts[] = resp.split("|");
                 if (parts[0].equals("1")) {
-                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    System.out.println("Tem uma notificação:\n" + resp.substring(2));
                     notificacao = true;
                 } else notificacao = false;                    
             } while (notificacao == true);
@@ -344,7 +344,7 @@ public class ClienteApp {
                 resp = (String) in.readObject();
                 String parts[] = resp.split("|");
                 if (parts[0].equals("1")) {
-                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    System.out.println("Tem uma notificação:\n" + resp.substring(2));
                     notificacao = true;
                 } else notificacao = false;                    
             } while (notificacao == true);
@@ -393,7 +393,7 @@ public class ClienteApp {
                     for (String part : parts) {
                         System.out.println(part);
                     }
-                    System.out.println("Tem uma notificação:\n" + parts[2]);
+                    System.out.println("Tem uma notificação:\n" + resp.substring(2));
                     notificacao = true;
                 } else notificacao = false;                    
             } while (notificacao == true);
