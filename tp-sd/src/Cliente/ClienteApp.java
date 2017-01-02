@@ -210,7 +210,16 @@ public class ClienteApp {
             out.writeObject(idleilao);
             out.writeObject(valor);
 
-            String resp = (String) in.readObject();
+            boolean notificacao;
+            String resp;
+            do {
+                resp = (String) in.readObject();
+                String parts[] = resp.split("|");
+                if (parts[0].equals("1")) {
+                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    notificacao = true;
+                } else notificacao = false;                    
+            } while (notificacao == true);
 
             System.out.println(resp);
         }catch (IOException | ClassNotFoundException e){
@@ -224,7 +233,16 @@ public class ClienteApp {
 
             out.writeObject("consultar");
 
-            String resp = (String) in.readObject();
+            boolean notificacao;
+            String resp;
+            do {
+                resp = (String) in.readObject();
+                String parts[] = resp.split("|");
+                if (parts[0].equals("1")) {
+                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    notificacao = true;
+                } else notificacao = false;                    
+            } while (notificacao == true);
 
             System.out.println(resp);
 
@@ -244,7 +262,17 @@ public class ClienteApp {
             out.writeObject("mudarpassword");
             out.writeObject(novapassword);
 
-            String resp = (String)in.readObject();
+            boolean notificacao;
+            String resp;
+            do {
+                resp = (String) in.readObject();
+                String parts[] = resp.split("|");
+                if (parts[0].equals("1")) {
+                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    notificacao = true;
+                } else notificacao = false;                    
+            } while (notificacao == true);
+            
             System.out.println(resp);
         }catch (IOException | ClassNotFoundException e){
             e.printStackTrace();
@@ -279,7 +307,16 @@ public class ClienteApp {
             out.writeObject("criar");
             out.writeObject(detalhes);
 
-            String resp = (String) in.readObject();
+            boolean notificacao;
+            String resp;
+            do {
+                resp = (String) in.readObject();
+                String parts[] = resp.split("|");
+                if (parts[0].equals("1")) {
+                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    notificacao = true;
+                } else notificacao = false;                    
+            } while (notificacao == true);
 
             System.out.println(resp);
 
@@ -301,7 +338,16 @@ public class ClienteApp {
 
             out.writeObject(idleilao);
 
-            String resp = (String) in.readObject();
+            boolean notificacao;
+            String resp;
+            do {
+                resp = (String) in.readObject();
+                String parts[] = resp.split("|");
+                if (parts[0].equals("1")) {
+                    System.out.println("Tem uma notificação:\n" + parts[1]);
+                    notificacao = true;
+                } else notificacao = false;                    
+            } while (notificacao == true);
 
             System.out.println(resp);
         } catch (IOException | ClassNotFoundException e){
@@ -337,7 +383,20 @@ public class ClienteApp {
 
             out.writeObject(idleilao);
 
-            String resp = (String) in.readObject();
+            boolean notificacao;
+            String resp;
+            do {
+                resp = (String) in.readObject();
+                System.out.println(resp);
+                String parts[] = resp.split("|");
+                if (parts[0].equals("1")) {
+                    for (String part : parts) {
+                        System.out.println(part);
+                    }
+                    System.out.println("Tem uma notificação:\n" + parts[2]);
+                    notificacao = true;
+                } else notificacao = false;                    
+            } while (notificacao == true);
 
             System.out.println(resp);
         } catch (IOException | ClassNotFoundException e){

@@ -111,18 +111,6 @@ public class ServidorThread extends Thread {
                     out.writeObject(this.leiloes.listarEmCurso(this.utilizador.getUsername()));
                 }
 
-
-                if (line.equals("mudarpassword")) {
-                    String newpassword = (String) in.readObject();
-                    try {
-                        Thread wt = new WorkerThread(out,users,leiloes,line,this.utilizador.getUsername(),newpassword);
-                        wt.start();                        
-                    }catch (Exception e) {
-                        System.out.println("Erro!");
-                        e.printStackTrace();
-                    }
-                }
-
                 if (line.equals("criar")) {
                     String detalhes, resp;
                     detalhes = (String) in.readObject();
@@ -136,7 +124,7 @@ public class ServidorThread extends Thread {
                     int id = (int) in.readObject();     
                     String resp;
                     resp = this.leiloes.fecharLeilao(id, this.utilizador.getUsername());
-                out.writeObject(resp);
+                    out.writeObject(resp);
                 }
                 
                 if (line.equals("logout")) {
